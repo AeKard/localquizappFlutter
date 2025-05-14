@@ -1,4 +1,4 @@
-# quizapp
+# LOCAL QUIZ APPLICATION
 
 A new Flutter project.
 
