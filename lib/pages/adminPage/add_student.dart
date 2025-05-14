@@ -11,9 +11,9 @@ class AddStudent extends StatefulWidget {
 }
 
 class _AddStudent extends State<AddStudent> {
-  final TextEditingController _studentUsernameController =
+  final TextEditingController _studentNumberController =
       TextEditingController();
-  final TextEditingController _studentPasswordController =
+  final TextEditingController _studentLastNameController =
       TextEditingController();
   List<dynamic> students = [];
 
@@ -46,8 +46,8 @@ class _AddStudent extends State<AddStudent> {
       "http://localhost/flutter_LocalQuizApp/checkstudent.php",
     );
     Map<String, String> body = {
-      "username": _studentUsernameController.text.trim(),
-      "password": _studentPasswordController.text.trim(),
+      "studentnumber": _studentNumberController.text.trim(),
+      "lastname": _studentLastNameController.text.trim(),
     };
     try {
       final response = await http.post(uri, body: body);
@@ -68,24 +68,19 @@ class _AddStudent extends State<AddStudent> {
   Future<void> addStudent() async {
     Uri uri = Uri.parse("http://localhost/flutter_LocalQuizApp/addstudent.php");
     Map<String, String> body = {
-      "username": _studentUsernameController.text.trim(),
-      "password": _studentPasswordController.text.trim(),
+      "studentnumber": _studentNumberController.text.trim(),
+      "lastname": _studentLastNameController.text.trim(),
     };
-    debugPrint(
-      _studentUsernameController.text.trim() +
-          _studentPasswordController.text.trim(),
-    );
     try {
       final response = await http.post(uri, body: body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
         if (data['status'] == 'success') {
           if (!mounted) return;
           showMessageDialog(context, "Successfull", "Added Successfuly");
-          _studentUsernameController.clear();
-          _studentPasswordController.clear();
+          _studentNumberController.clear();
+          _studentLastNameController.clear();
           errorText = '';
         }
       }
@@ -95,10 +90,10 @@ class _AddStudent extends State<AddStudent> {
   }
 
   void _checkStudentExist() async {
-    String username = _studentUsernameController.text.trim();
-    String password = _studentPasswordController.text.trim();
+    String studentNumber = _studentNumberController.text.trim();
+    String lastName = _studentLastNameController.text.trim();
     bool studentExist = await isStudentExist();
-    if (username.isEmpty || password.isEmpty) {
+    if (studentNumber.isEmpty || lastName.isEmpty) {
       setState(() {
         errorText = 'Fill out the fields';
       });
@@ -122,10 +117,9 @@ class _AddStudent extends State<AddStudent> {
       "http://localhost/flutter_LocalQuizApp/deleteStudent.php",
     );
     Map<String, String> body = {
-      "username": _studentUsernameController.text.trim(),
-      "password": _studentPasswordController.text.trim(),
+      "studentnumber": _studentNumberController.text.trim(),
+      "lastname": _studentLastNameController.text.trim(),
     };
-
     try {
       final response = await http.post(uri, body: body);
 
@@ -135,8 +129,8 @@ class _AddStudent extends State<AddStudent> {
           await fetchStudents();
           if (!mounted) return;
           showMessageDialog(context, "Successfull", "Deleted Successfuly");
-          _studentUsernameController.clear();
-          _studentPasswordController.clear();
+          _studentNumberController.clear();
+          _studentLastNameController.clear();
           errorText = '';
         } else {
           setState(() {
@@ -178,17 +172,15 @@ class _AddStudent extends State<AddStudent> {
       scrollDirection: Axis.horizontal,
       child: DataTable(
         columns: const [
-          DataColumn(label: Text("ID")),
-          DataColumn(label: Text("Username")),
-          DataColumn(label: Text("Password")),
+          DataColumn(label: Text("STUDENT NUMBER")),
+          DataColumn(label: Text("LASTNAME")),
         ],
         rows:
             students.map((student) {
               return DataRow(
                 cells: [
-                  DataCell(Text(student['id'])),
-                  DataCell(Text(student['username'])),
-                  DataCell(Text(student['password'])),
+                  DataCell(Text(student['studentnumber'])),
+                  DataCell(Text(student['lastname'])),
                 ],
               );
             }).toList(),
@@ -226,12 +218,12 @@ class _AddStudent extends State<AddStudent> {
       child: Column(
         children: [
           TextField(
-            controller: _studentUsernameController,
-            decoration: InputDecoration(labelText: "Username"),
+            controller: _studentNumberController,
+            decoration: InputDecoration(labelText: "Student Number"),
           ),
           TextField(
-            controller: _studentPasswordController,
-            decoration: InputDecoration(labelText: "Password"),
+            controller: _studentLastNameController,
+            decoration: InputDecoration(labelText: "Student Last Name"),
           ),
           SizedBox(height: 20),
           Row(
