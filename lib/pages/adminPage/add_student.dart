@@ -15,8 +15,31 @@ class _AddStudent extends State<AddStudent> {
       TextEditingController();
   final TextEditingController _studentPasswordController =
       TextEditingController();
+  List<dynamic> students = [];
 
   String errorText = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStudents();
+  }
+
+  Future<void> fetchStudents() async {
+    final response = await http.get(
+      Uri.parse("http://localhost/flutter_LocalQuizApp/getstudent.php"),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        students = jsonDecode(response.body);
+      });
+    } else {
+      setState(() {
+        students = jsonDecode(response.body);
+      });
+    }
+  }
 
   Future<bool> isStudentExist() async {
     Uri uri = Uri.parse(
@@ -43,11 +66,15 @@ class _AddStudent extends State<AddStudent> {
   }
 
   Future<void> addStudent() async {
-    Uri uri = Uri.parse("http://localhost/flutter_LocalQuizApp/addStudent.php");
+    Uri uri = Uri.parse("http://localhost/flutter_LocalQuizApp/addstudent.php");
     Map<String, String> body = {
       "username": _studentUsernameController.text.trim(),
       "password": _studentPasswordController.text.trim(),
     };
+    debugPrint(
+      _studentUsernameController.text.trim() +
+          _studentPasswordController.text.trim(),
+    );
     try {
       final response = await http.post(uri, body: body);
 
@@ -55,7 +82,11 @@ class _AddStudent extends State<AddStudent> {
         final data = jsonDecode(response.body);
 
         if (data['status'] == 'success') {
-          debugPrint("ADD SUCCESSFUL");
+          if (!mounted) return;
+          showMessageDialog(context, "Successfull", "Added Successfuly");
+          _studentUsernameController.clear();
+          _studentPasswordController.clear();
+          errorText = '';
         }
       }
     } catch (e) {
@@ -78,6 +109,7 @@ class _AddStudent extends State<AddStudent> {
 
     if (!studentExist) {
       await addStudent();
+      await fetchStudents();
     } else {
       setState(() {
         errorText = 'Student account already exists';
@@ -85,28 +117,141 @@ class _AddStudent extends State<AddStudent> {
     }
   }
 
+  Future<void> _deleteStudent() async {
+    Uri uri = Uri.parse(
+      "http://localhost/flutter_LocalQuizApp/deleteStudent.php",
+    );
+    Map<String, String> body = {
+      "username": _studentUsernameController.text.trim(),
+      "password": _studentPasswordController.text.trim(),
+    };
+
+    try {
+      final response = await http.post(uri, body: body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          await fetchStudents();
+          if (!mounted) return;
+          showMessageDialog(context, "Successfull", "Deleted Successfuly");
+          _studentUsernameController.clear();
+          _studentPasswordController.clear();
+          errorText = '';
+        } else {
+          setState(() {
+            errorText = data['message'] ?? "Delete failed";
+          });
+        }
+      } else {
+        debugPrint("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("Error occurred: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: appbar(context), body: studentAddContainer());
+    return Scaffold(
+      appBar: appbar(context),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                studentAddContainer(),
+                SizedBox(height: 16),
+                scrollableTable(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  SingleChildScrollView scrollableTable() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: const [
+          DataColumn(label: Text("ID")),
+          DataColumn(label: Text("Username")),
+          DataColumn(label: Text("Password")),
+        ],
+        rows:
+            students.map((student) {
+              return DataRow(
+                cells: [
+                  DataCell(Text(student['id'])),
+                  DataCell(Text(student['username'])),
+                  DataCell(Text(student['password'])),
+                ],
+              );
+            }).toList(),
+      ),
+    );
+  }
+
+  void showMessageDialog(
+    BuildContext context,
+    String title,
+    String message,
+  ) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Padding studentAddContainer() {
     return Padding(
-      padding: EdgeInsets.all(20.0),
+      padding: EdgeInsets.all(5.0),
       child: Column(
         children: [
           TextField(
             controller: _studentUsernameController,
-            decoration: InputDecoration(labelText: "Add Student Username"),
+            decoration: InputDecoration(labelText: "Username"),
           ),
           TextField(
             controller: _studentPasswordController,
-            decoration: InputDecoration(labelText: "Add Stdeunt password"),
+            decoration: InputDecoration(labelText: "Password"),
           ),
           SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _checkStudentExist,
-            child: Text("Add Student"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: ElevatedButton(
+                  onPressed: _checkStudentExist,
+                  child: Text("Add Student"),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: ElevatedButton(
+                  onPressed: _deleteStudent,
+                  child: Text("Delete Student"),
+                ),
+              ),
+            ],
           ),
           if (errorText.isNotEmpty)
             Padding(
