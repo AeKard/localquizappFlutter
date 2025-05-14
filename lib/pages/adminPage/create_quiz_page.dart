@@ -17,7 +17,7 @@ class _CreateQuizPageState extends State<CreateQuizPage> {
   AppBar appbar(BuildContext context) {
     return AppBar(
       title: Text(
-        "Add Student",
+        "Create Quiz",
         style: TextStyle(
           color: Colors.black,
           fontSize: 18,
