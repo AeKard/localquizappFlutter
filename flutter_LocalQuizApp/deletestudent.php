@@ -23,4 +23,5 @@ if (isset($_POST['studentnumber']) && isset($_POST['lastname'])) {
 } else {
     echo json_encode(["status" => "error", "message" => "Missing parameters."]);
 }
+mysqli_close($conn);
 ?>

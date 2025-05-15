@@ -89,7 +89,7 @@ class _AddStudent extends State<AddStudent> {
     }
   }
 
-  void _checkStudentExist() async {
+  void _checkForError() async {
     String studentNumber = _studentNumberController.text.trim();
     String lastName = _studentLastNameController.text.trim();
     bool studentExist = await isStudentExist();
@@ -167,6 +167,75 @@ class _AddStudent extends State<AddStudent> {
     );
   }
 
+  AppBar appbar(BuildContext context) {
+    return AppBar(
+      title: Text(
+        "Add Student",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      backgroundColor: Colors.white,
+      centerTitle: true,
+      elevation: 0.0,
+      leading: GestureDetector(
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/admin');
+        },
+        child: Container(
+          alignment: Alignment.center,
+          margin: EdgeInsets.all(10),
+          child: SvgPicture.asset('assets/icons/arrow-left-solid.svg'),
+        ),
+      ),
+    );
+  }
+
+  Padding studentAddContainer() {
+    return Padding(
+      padding: EdgeInsets.all(5.0),
+      child: Column(
+        children: [
+          TextField(
+            controller: _studentNumberController,
+            decoration: InputDecoration(labelText: "Student Number"),
+          ),
+          TextField(
+            controller: _studentLastNameController,
+            decoration: InputDecoration(labelText: "Student Last Name"),
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: ElevatedButton(
+                  onPressed: _checkForError,
+                  child: Text("Add Student"),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: ElevatedButton(
+                  onPressed: _deleteStudent,
+                  child: Text("Delete Student"),
+                ),
+              ),
+            ],
+          ),
+          if (errorText.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Text(errorText, style: TextStyle(color: Colors.red)),
+            ),
+        ],
+      ),
+    );
+  }
+
   SingleChildScrollView scrollableTable() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -209,75 +278,6 @@ class _AddStudent extends State<AddStudent> {
           ],
         );
       },
-    );
-  }
-
-  Padding studentAddContainer() {
-    return Padding(
-      padding: EdgeInsets.all(5.0),
-      child: Column(
-        children: [
-          TextField(
-            controller: _studentNumberController,
-            decoration: InputDecoration(labelText: "Student Number"),
-          ),
-          TextField(
-            controller: _studentLastNameController,
-            decoration: InputDecoration(labelText: "Student Last Name"),
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 10, right: 10),
-                child: ElevatedButton(
-                  onPressed: _checkStudentExist,
-                  child: Text("Add Student"),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 10, right: 10),
-                child: ElevatedButton(
-                  onPressed: _deleteStudent,
-                  child: Text("Delete Student"),
-                ),
-              ),
-            ],
-          ),
-          if (errorText.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Text(errorText, style: TextStyle(color: Colors.red)),
-            ),
-        ],
-      ),
-    );
-  }
-
-  AppBar appbar(BuildContext context) {
-    return AppBar(
-      title: Text(
-        "Add Student",
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      backgroundColor: Colors.white,
-      centerTitle: true,
-      elevation: 0.0,
-      leading: GestureDetector(
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/admin');
-        },
-        child: Container(
-          alignment: Alignment.center,
-          margin: EdgeInsets.all(10),
-          child: SvgPicture.asset('assets/icons/arrow-left-solid.svg'),
-        ),
-      ),
     );
   }
 }

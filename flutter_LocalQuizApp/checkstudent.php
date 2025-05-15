@@ -13,4 +13,6 @@
     } else {
         echo json_encode(["status" => "error"]);
     }
+
+    mysqli_close($conn);
 ?>

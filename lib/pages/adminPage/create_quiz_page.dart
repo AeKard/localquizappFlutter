@@ -1,25 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class CreateQuizPage extends StatefulWidget {
-  const CreateQuizPage({super.key});
+class CreateQuestionPage extends StatefulWidget {
+  const CreateQuestionPage({super.key});
 
   @override
-  State<CreateQuizPage> createState() => _CreateQuizPageState();
+  State<CreateQuestionPage> createState() => _CreateQuestionPageState();
 }
 
-class _CreateQuizPageState extends State<CreateQuizPage> {
+class _CreateQuestionPageState extends State<CreateQuestionPage> {
   final TextEditingController _questionController = TextEditingController();
   final TextEditingController _choiceAController = TextEditingController();
   final TextEditingController _choiceBController = TextEditingController();
   final TextEditingController _choiceCController = TextEditingController();
   final TextEditingController _choiceDController = TextEditingController();
 
-  String _correctAnswer = 'A'; // or nullable if you want to validate selection
+  String _correctAnswer = '';
 
-  void _submitQuestion() {
-    // Handle submission logic here
+  Future<void> addQuestion() async {
+    Uri uri = Uri.parse(
+      "http://localhost/flutter_LocalQuizApp/addquestion.php",
+    );
+    debugPrint(
+      _questionController.text.trim() +
+          _choiceAController.text.trim() +
+          _choiceBController.text.trim() +
+          _choiceCController.text.trim() +
+          _choiceDController.text.trim() +
+          _correctAnswer,
+    );
+    Map<String, String> body = {
+      "question": _questionController.text.trim(),
+      "a": _choiceAController.text.trim(),
+      "c": _choiceBController.text.trim(),
+      "b": _choiceCController.text.trim(),
+      "d": _choiceDController.text.trim(),
+      "answer_letter": _correctAnswer,
+    };
+    try {
+      final response = await http.post(uri, body: body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          if (!mounted) return;
+          showMessageDialog(context, "Successfull", "Added Successfuly");
+          _questionController.clear();
+          _choiceAController.clear();
+          _choiceBController.clear();
+          _choiceCController.clear();
+          _choiceDController.clear();
+        }
+      }
+    } catch (e) {
+      debugPrint("Error occurred: $e");
+    }
   }
+
+  void _checkForError() async {
+    String question = _questionController.text.trim();
+    String choiceA = _choiceAController.text.trim();
+    String choiceB = _choiceBController.text.trim();
+    String choiceC = _choiceCController.text.trim();
+    String choiceD = _choiceDController.text.trim();
+    debugPrint(
+      question + choiceA + choiceB + choiceC + choiceD + _correctAnswer,
+    );
+    if (question.isEmpty ||
+        choiceA.isEmpty ||
+        choiceB.isEmpty ||
+        choiceC.isEmpty ||
+        choiceD.isEmpty ||
+        _correctAnswer.isEmpty) {
+      showMessageDialog(
+        context,
+        "Fill out all fields",
+        "One of the Fields are Empty",
+      );
+      return;
+    }
+
+    addQuestion();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,7 +160,7 @@ class _CreateQuizPageState extends State<CreateQuizPage> {
             SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: _submitQuestion,
+                onPressed: _checkForError,
                 child: Text('Submit'),
               ),
             ),
@@ -120,7 +185,7 @@ class _CreateQuizPageState extends State<CreateQuizPage> {
       elevation: 0.0,
       leading: GestureDetector(
         onTap: () {
-          Navigator.pushReplacementNamed(context, '/admin');
+          Navigator.pop(context);
         },
         child: Container(
           alignment: Alignment.center,
@@ -128,6 +193,30 @@ class _CreateQuizPageState extends State<CreateQuizPage> {
           child: SvgPicture.asset('assets/icons/arrow-left-solid.svg'),
         ),
       ),
+    );
+  }
+
+  void showMessageDialog(
+    BuildContext context,
+    String title,
+    String message,
+  ) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
     );
   }
 }
