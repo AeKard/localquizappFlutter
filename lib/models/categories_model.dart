@@ -17,10 +17,10 @@ class CategoriesModel {
     List<CategoriesModel> categories = [];
     categories.add(
       CategoriesModel(
-        name: 'Create Quiz',
+        name: 'Create Question',
         icon: 'assets/icons/pen-to-square-solid.svg',
         boxColor: Colors.white,
-        route: '/create_quiz',
+        route: '/createQuestion',
       ),
     );
     categories.add(
@@ -37,6 +37,14 @@ class CategoriesModel {
         icon: 'assets/icons/user-plus-solid.svg',
         boxColor: Colors.white,
         route: '/addStudent',
+      ),
+    );
+    categories.add(
+      CategoriesModel(
+        name: 'Delete Question',
+        icon: 'assets/icons/trash-solid.svg',
+        boxColor: Colors.white,
+        route: '/deleteQuestion',
       ),
     );
     return categories;
