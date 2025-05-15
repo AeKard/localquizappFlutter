@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 14, 2025 at 06:56 PM
+-- Generation Time: May 15, 2025 at 12:58 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -34,8 +34,25 @@ CREATE TABLE `quiz` (
   `B` varchar(255) NOT NULL,
   `C` varchar(255) NOT NULL,
   `D` varchar(255) NOT NULL,
-  `answer_letter` char(1) NOT NULL CHECK (`answer_letter` in ('A','B','C','D'))
+  `answer_letter` char(1) NOT NULL CHECK (`answer_letter` in ('A','B','C','D')),
+  `active` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `quiz`
+--
+
+INSERT INTO `quiz` (`id`, `question`, `A`, `B`, `C`, `D`, `answer_letter`, `active`) VALUES
+(1, 'question', '1', '3', '2', '4', 'A', 1),
+(2, 'what is human', 'a person', 'maybe a fish', 'plant', 'color', 'A', 1),
+(3, '1', '1', '1', '1', '1', 'A', 0),
+(4, '1', '1', '1', '1', '1', 'C', 0),
+(5, '1', '1', '1', '1', '1', 'A', 0),
+(6, '1', '1', '1', '1', '1', 'A', 0),
+(7, '2', '2', '2', '2', '2', 'A', 0),
+(8, '3', '3', '3', '3', '3', 'A', 0),
+(9, '2+1', '23', '3', '5', '2', 'C', 0),
+(10, '2+2', '4', '2', '1', '3', 'A', 0);
 
 -- --------------------------------------------------------
 
@@ -135,7 +152,7 @@ ALTER TABLE `student_grade`
 -- AUTO_INCREMENT for table `quiz`
 --
 ALTER TABLE `quiz`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `studentaccount`

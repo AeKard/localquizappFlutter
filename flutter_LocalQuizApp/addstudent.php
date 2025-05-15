@@ -36,4 +36,5 @@
     } else {
         echo json_encode(["status" => "error", "message" => "Missing parameters."]);
     }
+    mysqli_close($conn);
 ?>

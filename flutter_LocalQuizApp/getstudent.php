@@ -13,4 +13,5 @@
         $students[] = $row;
     }
     echo json_encode($students);
+    mysqli_close($conn);
 ?>
