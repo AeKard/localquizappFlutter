@@ -1,6 +1,10 @@
-# quizapp
+# LOCAL QUIZ APPLICATION
 
 A new Flutter project.
+
+THE DATABASE TEMPLATE -> Localquizapp.
+
+THE XAMPP HTDOCS PHP FOLDER -> flutter_LocalQuizApp.
 
 ## Getting Started
 

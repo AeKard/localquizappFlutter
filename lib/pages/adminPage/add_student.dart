@@ -11,20 +11,43 @@ class AddStudent extends StatefulWidget {
 }
 
 class _AddStudent extends State<AddStudent> {
-  final TextEditingController _studentUsernameController =
+  final TextEditingController _studentNumberController =
       TextEditingController();
-  final TextEditingController _studentPasswordController =
+  final TextEditingController _studentLastNameController =
       TextEditingController();
+  List<dynamic> students = [];
 
   String errorText = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStudents();
+  }
+
+  Future<void> fetchStudents() async {
+    final response = await http.get(
+      Uri.parse("http://localhost/flutter_LocalQuizApp/getstudent.php"),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        students = jsonDecode(response.body);
+      });
+    } else {
+      setState(() {
+        students = jsonDecode(response.body);
+      });
+    }
+  }
 
   Future<bool> isStudentExist() async {
     Uri uri = Uri.parse(
       "http://localhost/flutter_LocalQuizApp/checkstudent.php",
     );
     Map<String, String> body = {
-      "username": _studentUsernameController.text.trim(),
-      "password": _studentPasswordController.text.trim(),
+      "studentnumber": _studentNumberController.text.trim(),
+      "lastname": _studentLastNameController.text.trim(),
     };
     try {
       final response = await http.post(uri, body: body);
@@ -43,19 +66,22 @@ class _AddStudent extends State<AddStudent> {
   }
 
   Future<void> addStudent() async {
-    Uri uri = Uri.parse("http://localhost/flutter_LocalQuizApp/addStudent.php");
+    Uri uri = Uri.parse("http://localhost/flutter_LocalQuizApp/addstudent.php");
     Map<String, String> body = {
-      "username": _studentUsernameController.text.trim(),
-      "password": _studentPasswordController.text.trim(),
+      "studentnumber": _studentNumberController.text.trim(),
+      "lastname": _studentLastNameController.text.trim(),
     };
     try {
       final response = await http.post(uri, body: body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
         if (data['status'] == 'success') {
-          debugPrint("ADD SUCCESSFUL");
+          if (!mounted) return;
+          showMessageDialog(context, "Successfull", "Added Successfuly");
+          _studentNumberController.clear();
+          _studentLastNameController.clear();
+          errorText = '';
         }
       }
     } catch (e) {
@@ -63,11 +89,11 @@ class _AddStudent extends State<AddStudent> {
     }
   }
 
-  void _checkStudentExist() async {
-    String username = _studentUsernameController.text.trim();
-    String password = _studentPasswordController.text.trim();
+  void _checkForError() async {
+    String studentNumber = _studentNumberController.text.trim();
+    String lastName = _studentLastNameController.text.trim();
     bool studentExist = await isStudentExist();
-    if (username.isEmpty || password.isEmpty) {
+    if (studentNumber.isEmpty || lastName.isEmpty) {
       setState(() {
         errorText = 'Fill out the fields';
       });
@@ -78,6 +104,7 @@ class _AddStudent extends State<AddStudent> {
 
     if (!studentExist) {
       await addStudent();
+      await fetchStudents();
     } else {
       setState(() {
         errorText = 'Student account already exists';
@@ -85,35 +112,57 @@ class _AddStudent extends State<AddStudent> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: appbar(context), body: studentAddContainer());
+  Future<void> _deleteStudent() async {
+    Uri uri = Uri.parse(
+      "http://localhost/flutter_LocalQuizApp/deleteStudent.php",
+    );
+    Map<String, String> body = {
+      "studentnumber": _studentNumberController.text.trim(),
+      "lastname": _studentLastNameController.text.trim(),
+    };
+    try {
+      final response = await http.post(uri, body: body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          await fetchStudents();
+          if (!mounted) return;
+          showMessageDialog(context, "Successfull", "Deleted Successfuly");
+          _studentNumberController.clear();
+          _studentLastNameController.clear();
+          errorText = '';
+        } else {
+          setState(() {
+            errorText = data['message'] ?? "Delete failed";
+          });
+        }
+      } else {
+        debugPrint("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("Error occurred: $e");
+    }
   }
 
-  Padding studentAddContainer() {
-    return Padding(
-      padding: EdgeInsets.all(20.0),
-      child: Column(
-        children: [
-          TextField(
-            controller: _studentUsernameController,
-            decoration: InputDecoration(labelText: "Add Student Username"),
-          ),
-          TextField(
-            controller: _studentPasswordController,
-            decoration: InputDecoration(labelText: "Add Stdeunt password"),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _checkStudentExist,
-            child: Text("Add Student"),
-          ),
-          if (errorText.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Text(errorText, style: TextStyle(color: Colors.red)),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: appbar(context),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                studentAddContainer(),
+                SizedBox(height: 16),
+                scrollableTable(),
+              ],
             ),
-        ],
+          ),
+        ),
       ),
     );
   }
@@ -141,6 +190,94 @@ class _AddStudent extends State<AddStudent> {
           child: SvgPicture.asset('assets/icons/arrow-left-solid.svg'),
         ),
       ),
+    );
+  }
+
+  Padding studentAddContainer() {
+    return Padding(
+      padding: EdgeInsets.all(5.0),
+      child: Column(
+        children: [
+          TextField(
+            controller: _studentNumberController,
+            decoration: InputDecoration(labelText: "Student Number"),
+          ),
+          TextField(
+            controller: _studentLastNameController,
+            decoration: InputDecoration(labelText: "Student Last Name"),
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: ElevatedButton(
+                  onPressed: _checkForError,
+                  child: Text("Add Student"),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: ElevatedButton(
+                  onPressed: _deleteStudent,
+                  child: Text("Delete Student"),
+                ),
+              ),
+            ],
+          ),
+          if (errorText.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Text(errorText, style: TextStyle(color: Colors.red)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  SingleChildScrollView scrollableTable() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: const [
+          DataColumn(label: Text("STUDENT NUMBER")),
+          DataColumn(label: Text("LASTNAME")),
+        ],
+        rows:
+            students.map((student) {
+              return DataRow(
+                cells: [
+                  DataCell(Text(student['studentnumber'])),
+                  DataCell(Text(student['lastname'])),
+                ],
+              );
+            }).toList(),
+      ),
+    );
+  }
+
+  void showMessageDialog(
+    BuildContext context,
+    String title,
+    String message,
+  ) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

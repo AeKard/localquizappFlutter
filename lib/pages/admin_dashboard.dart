@@ -55,12 +55,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
               ),
               onTap: () {
-                if (category.name == 'Create Quiz') {
-                  Navigator.pushNamed(context, '/createQuiz');
+                if (category.name == 'Create Question') {
+                  Navigator.pushNamed(context, '/createQuestion');
                 } else if (category.name == 'Monitor Result') {
                   Navigator.pushNamed(context, '/monitorResult');
                 } else if (category.name == 'Add Student') {
                   Navigator.pushNamed(context, '/addStudent');
+                } else if (category.name == 'Delete Question') {
+                  Navigator.pushNamed(context, '/deleteQuestion');
                 }
               },
             ),

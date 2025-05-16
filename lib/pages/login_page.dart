@@ -20,8 +20,8 @@ class _LoginPageState extends State<LoginPage> {
     );
     debugPrint(_usernameController.text + _passwordController.text);
     Map<String, String> body = {
-      "username": _usernameController.text.trim(),
-      "password": _passwordController.text.trim(),
+      "studentnumber": _usernameController.text.trim(),
+      "lastname": _passwordController.text.trim(),
     };
     try {
       final response = await http.post(uri, body: body);
