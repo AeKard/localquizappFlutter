@@ -29,7 +29,7 @@ class _MonitorResult extends State<MonitorResult> {
       elevation: 0.0,
       leading: GestureDetector(
         onTap: () {
-          Navigator.pushReplacementNamed(context, '/admin');
+          Navigator.pop(context);
         },
         child: Container(
           alignment: Alignment.center,
