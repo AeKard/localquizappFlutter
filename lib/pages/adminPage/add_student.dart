@@ -89,29 +89,6 @@ class _AddStudent extends State<AddStudent> {
     }
   }
 
-  void _checkForError() async {
-    String studentNumber = _studentNumberController.text.trim();
-    String lastName = _studentLastNameController.text.trim();
-    bool studentExist = await isStudentExist();
-    if (studentNumber.isEmpty || lastName.isEmpty) {
-      setState(() {
-        errorText = 'Fill out the fields';
-      });
-      return;
-    }
-
-    if (!mounted) return;
-
-    if (!studentExist) {
-      await addStudent();
-      await fetchStudents();
-    } else {
-      setState(() {
-        errorText = 'Student account already exists';
-      });
-    }
-  }
-
   Future<void> _deleteStudent() async {
     Uri uri = Uri.parse(
       "http://localhost/flutter_LocalQuizApp/deleteStudent.php",
@@ -142,6 +119,29 @@ class _AddStudent extends State<AddStudent> {
       }
     } catch (e) {
       debugPrint("Error occurred: $e");
+    }
+  }
+
+  void _checkForError() async {
+    String studentNumber = _studentNumberController.text.trim();
+    String lastName = _studentLastNameController.text.trim();
+    bool studentExist = await isStudentExist();
+    if (studentNumber.isEmpty || lastName.isEmpty) {
+      setState(() {
+        errorText = 'Fill out the fields';
+      });
+      return;
+    }
+
+    if (!mounted) return;
+
+    if (!studentExist) {
+      await addStudent();
+      await fetchStudents();
+    } else {
+      setState(() {
+        errorText = 'Student account already exists';
+      });
     }
   }
 
