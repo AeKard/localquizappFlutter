@@ -11,7 +11,163 @@ class MonitorResult extends StatefulWidget {
 class _MonitorResult extends State<MonitorResult> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: appbar(context));
+    return Scaffold(
+      appBar: appbar(context),
+
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Search username or id',
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: SvgPicture.asset(
+                    'assets/icons/search.svg',
+                    width: 20,
+                    height: 20,
+                    color: Colors.grey,
+                  ),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            Expanded(
+              child: ListView(
+                children: [
+                  DataTable(
+                    columns: const [
+                      DataColumn(
+                        label: Expanded(
+                          child: Center(
+                            child: Text(
+                              'ID',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Expanded(
+                          child: Center(
+                            child: Text(
+                              'Usename',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Expanded(
+                          child: Center(
+                            child: Text(
+                              'Score',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    rows: const [
+                      DataRow(
+                        cells: [
+                          DataCell(Center(child: Text('1'))),
+                          DataCell(Center(child: Text('name'))),
+                          DataCell(Center(child: Text('score'))),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Padding tablesearch() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Search username or id',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SvgPicture.asset(
+                  'assets/icons/search.svg',
+                  width: 20,
+                  height: 20,
+                  color: Colors.grey,
+                ),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          Expanded(
+            child: ListView(
+              children: [
+                DataTable(
+                  columns: const [
+                    DataColumn(
+                      label: Expanded(
+                        child: Center(
+                          child: Text(
+                            'ID',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Expanded(
+                        child: Center(
+                          child: Text(
+                            'Usename',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Expanded(
+                        child: Center(
+                          child: Text(
+                            'Score',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  rows: const [
+                    DataRow(
+                      cells: [
+                        DataCell(Center(child: Text('1'))),
+                        DataCell(Center(child: Text('name'))),
+                        DataCell(Center(child: Text('score'))),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   AppBar appbar(BuildContext context) {
@@ -29,7 +185,7 @@ class _MonitorResult extends State<MonitorResult> {
       elevation: 0.0,
       leading: GestureDetector(
         onTap: () {
-          Navigator.pop(context);
+          Navigator.pushReplacementNamed(context, '/admin');
         },
         child: Container(
           alignment: Alignment.center,
