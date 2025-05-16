@@ -1,20 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quizapp/models/user_model.dart';
 import 'package:quizapp/studentPage/quiz_screen_state.dart';
 import 'package:quizapp/studentPage/view_result.dart';
 import 'package:flutter_svg/svg.dart';
 
 class StudentDashboard extends StatelessWidget {
   const StudentDashboard({super.key});
+  Future<void> _loadUser(BuildContext context) async {
+    await Provider.of<UserModel>(context, listen: false).loadUser();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: appbar(context), body: studentDashboard(context));
+    return FutureBuilder(
+      future: _loadUser(context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          final username = Provider.of<UserModel>(context).username ?? 'Guest';
+          return Scaffold(
+            appBar: appbar(context, username.toUpperCase()),
+            body: studentDashboard(context),
+          );
+        }
+      },
+    );
   }
 
-  AppBar appbar(BuildContext context) {
+  AppBar appbar(BuildContext context, String username) {
     return AppBar(
       title: Text(
-        "Student Dashboard",
+        "$username Dashboard",
         style: TextStyle(
           color: Colors.black,
           fontSize: 18,

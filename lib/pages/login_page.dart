@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'dart:convert';
+
+import 'package:quizapp/models/user_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -48,7 +51,12 @@ class _LoginPageState extends State<LoginPage> {
     if (username == "admin" && password == "admin") {
       Navigator.pushReplacementNamed(context, '/admin');
     } else {
-      if (studentExist || username == "student" && password == "student") {
+      if (studentExist) {
+        await Provider.of<UserModel>(context, listen: false).login(username);
+        if (!mounted) {
+          return;
+        }
+
         Navigator.pushReplacementNamed(context, '/student');
       } else {
         setState(() {
