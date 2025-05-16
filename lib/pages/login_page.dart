@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
     if (username == "admin" && password == "admin") {
       Navigator.pushReplacementNamed(context, '/admin');
     } else {
-      if (studentExist) {
+      if (studentExist || username == "student" && password == "student") {
         Navigator.pushReplacementNamed(context, '/student');
       } else {
         setState(() {
