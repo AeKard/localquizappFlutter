@@ -1,14 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+import 'package:quizapp/models/user_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class QuizResultUIOnly extends StatelessWidget {
+class QuizResultUIOnly extends StatefulWidget {
   const QuizResultUIOnly({super.key});
 
-  AppBar appbar(BuildContext context) {
+  @override
+  State<QuizResultUIOnly> createState() => _QuizResultUIOnlyState();
+}
+
+class _QuizResultUIOnlyState extends State<QuizResultUIOnly> {
+  String _score = "Loading...";
+  String _questionCount = "Loading...";
+
+  Future<void> _loadUserAndScore(BuildContext context) async {
+    await Provider.of<UserModel>(context, listen: false).loadUser();
+    final username =
+        Provider.of<UserModel>(context, listen: false).username ?? 'Guest';
+    debugPrint(username);
+    final response = await http.post(
+      Uri.parse("http://localhost/flutter_LocalQuizApp/getscore.php"),
+      body: {'studentnumber': username},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success'] == true) {
+        setState(() {
+          _score = data['score'].toString();
+          _questionCount = data['question_count'].toString();
+        });
+      } else {
+        setState(() {
+          _score = "Score not found";
+          _questionCount = "Question count not found";
+        });
+      }
+    } else {
+      setState(() {
+        _score = "Error fetching score";
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Delay to ensure context is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadUserAndScore(context);
+    });
+  }
+
+  AppBar appbar(BuildContext context, String username) {
     return AppBar(
       title: Text(
-        "Student Dashboard",
-        style: TextStyle(
+        "$username Results",
+        style: const TextStyle(
           color: Colors.black,
           fontSize: 18,
           fontWeight: FontWeight.bold,
@@ -23,7 +74,7 @@ class QuizResultUIOnly extends StatelessWidget {
         },
         child: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
           child: SvgPicture.asset('assets/icons/right-from-bracket-solid.svg'),
         ),
       ),
@@ -32,8 +83,9 @@ class QuizResultUIOnly extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final username = Provider.of<UserModel>(context).username ?? 'Guest';
     return Scaffold(
-      appBar: appbar(context),
+      appBar: appbar(context, username.toUpperCase()),
       backgroundColor: Colors.black,
       body: Center(
         child: Card(
@@ -49,7 +101,7 @@ class QuizResultUIOnly extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  'Quiz Title',
+                  'Quiz Score',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 26,
@@ -57,19 +109,19 @@ class QuizResultUIOnly extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Total Questions: 10',
+                Text(
+                  'Total Questions: $_questionCount', // You can make this dynamic later
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'Correct Answers: 8',
+                Text(
+                  'Correct Answers: $_score', // Also can be dynamic
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'Score: 80%',
-                  style: TextStyle(
+                Text(
+                  'Score: $_score',
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
