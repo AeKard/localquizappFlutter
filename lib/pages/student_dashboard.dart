@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quizapp/models/user_model.dart';
+import 'package:quizapp/pages/login_page.dart';
 import 'package:quizapp/studentPage/quiz_screen_state.dart';
 import 'package:quizapp/studentPage/view_result.dart';
 import 'package:flutter_svg/svg.dart';
@@ -122,27 +123,35 @@ class StudentDashboard extends StatelessWidget {
             ),
           ),
         ),
-        Container(
-          margin: EdgeInsets.all(30),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 4,
-                offset: Offset(2, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.exit_to_app, size: 100, color: Colors.black),
-              Text(
-                "Logout",
-                style: TextStyle(fontSize: 30, color: Colors.black),
-              ),
-            ],
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+            );
+          },
+          child: Container(
+            margin: EdgeInsets.all(30),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 4,
+                  offset: Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.exit_to_app, size: 100, color: Colors.black),
+                Text(
+                  "Logout",
+                  style: TextStyle(fontSize: 30, color: Colors.black),
+                ),
+              ],
+            ),
           ),
         ),
       ],
