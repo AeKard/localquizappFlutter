@@ -8,14 +8,12 @@ class UserModel extends ChangeNotifier {
 
   bool get isLoggedIn => _username != null;
 
-  // Initialize the user state from SharedPreferences
   Future<void> loadUser() async {
     final prefs = await SharedPreferences.getInstance();
     _username = prefs.getString('username');
     notifyListeners();
   }
 
-  // Save username and notify listeners
   Future<void> login(String username) async {
     _username = username;
     final prefs = await SharedPreferences.getInstance();
@@ -23,9 +21,9 @@ class UserModel extends ChangeNotifier {
 
     // Debugging
     if (result) {
-      debugPrint('✅ Username saved to SharedPreferences: $username');
+      debugPrint('Username saved to SharedPreferences: $username');
     } else {
-      debugPrint('❌ Failed to save username');
+      debugPrint('❌Failed to save username');
     }
 
     notifyListeners();

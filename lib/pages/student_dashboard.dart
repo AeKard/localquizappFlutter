@@ -32,7 +32,7 @@ class StudentDashboard extends StatelessWidget {
   AppBar appbar(BuildContext context, String username) {
     return AppBar(
       title: Text(
-        "$username Dashboard",
+        "Welcome '$username' To Your Dashboard",
         style: TextStyle(
           color: Colors.black,
           fontSize: 18,
