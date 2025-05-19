@@ -1,4 +1,4 @@
-# LOCAL QUIZ APPLICATION | Proctor Sir Castillio
+# LOCAL QUIZ APPLICATION | Proctor Sir Castillo
 
 ### Members Included in Programming:
 - Baza, Lord Drake  
