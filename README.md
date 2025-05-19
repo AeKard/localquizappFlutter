@@ -20,7 +20,8 @@ Once everything is in the correct folder and the database is setup:
 
 1. Find the Flutter directory.
 2. Open its directory in **VS Code**.
-3. Run the project with:
+3. Run Xampp
+4. Run the project with:
 
    ```bash
    flutter run -d chrome
